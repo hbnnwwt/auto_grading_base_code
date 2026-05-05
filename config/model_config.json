@@ -1,0 +1,9 @@
+{
+  "base_url": "https://api-inference.modelscope.cn",
+  "llm_model": "Qwen/Qwen3-235B-A22B",
+  "llm_max_tokens": 256,
+  "llm_temperature": 0.3,
+  "ocr_model": "Qwen/Qwen3-VL-235B-A22B-Instruct",
+  "ocr_max_tokens": 1024,
+  "ocr_prompt": "请逐行识别图片中的所有文字内容，只输出文字，不要添加解释。"
+}

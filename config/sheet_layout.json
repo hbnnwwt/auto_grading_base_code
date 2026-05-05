@@ -1,0 +1,13 @@
+{
+  "choice": {"rows": 5, "cols": 4, "question_start": 1, "question_count": 20},
+  "judge":  {"rows": 3, "cols": 4, "question_start": 21, "question_count": 10},
+  "layout": {
+    "page1_fallback": {"student_id": [0.06, 0.26], "choice": [0.28, 0.80]},
+    "page2_fallback": {"judge": [0.06, 0.46], "essay": [0.50, 0.90]}
+  },
+  "scoring": {
+    "choice_score": 3,
+    "judge_score": 2,
+    "essay_max_score": 20
+  }
+}
