@@ -250,3 +250,30 @@ cv2.imwrite('debug_viz.png', viz)
 **Q: 多选检测是什么？**
 A: 当学生同时填涂了两个及以上选项时，判定为无效答题。
 `BubbleRecognizerBase` 已实现了多选检测逻辑，你只需在 `recognize_all_with_viz` 中调用它。
+
+**Q: fork 后如何开始？**
+A:
+1. `git clone` 你 fork 的仓库
+2. 运行 `setup.bat` 安装依赖
+3. 运行 `streamlit run app.py` 确认能启动
+4. 从学号识别开始，逐个模块实现
+
+**Q: OCR 引擎怎么选？安装失败怎么办？**
+A: 推荐 `paddleocr`（对中文手写体效果最好）。如果安装失败，可以换 `easyocr` 或 `rapidocr`。
+切换方式：修改 `pipeline.py` 中的 `ocr_engine` 参数为 `'easyocr'` 或 `'rapidocr'`。
+
+**Q: threshold 参数怎么调？**
+A: `0.06` 是默认值，适合正常填涂。如果识别结果不稳定（漏填/误判），可以调高到 `0.08`（更严格）或调低到 `0.04`（更宽松）。调完后用示例图片测试，观察哪些题容易出错。
+
+**Q: 识别结果全是 None，是怎么回事？**
+A: 大概率是**预处理或版面分析未实现**，导致区域坐标提取失败。检查：
+1. `preprocess.py` 的 `process()` 方法是否返回了正确的二值化图像
+2. `layout.py` 的 `analyze()` 方法是否返回了正确的区域坐标
+3. `pipeline.py` 中的 `preprocess_and_analyze()` 是否正确调用了这两个方法
+
+**Q: 学号识别返回问号或空值怎么办？**
+A:
+1. 检查 ROI 区域是否正确（学号应该在图片左侧，宽度约占 1/4）
+2. 打印 `roi` 看图像是否有效（不是全黑/全白）
+3. 尝试调高 `threshold`（比如 `0.4`）或调低
+4. 检查是否需要先对 ROI 做灰度化和二值化处理
