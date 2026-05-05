@@ -15,7 +15,9 @@ git clone https://github.com/hbnnwwt/cv_wei.git
 # 2. Windows：一键安装依赖（创建虚拟环境 + 安装全部依赖）
 setup.bat
 
-# 3. 启动 GUI（此时识别结果为空，逐步实现模块后会越来越完整）
+# 3. 启动 GUI（双击 run_gui.bat 或命令行）
+run_gui.bat
+# 或
 streamlit run app.py
 
 # 4. 或者使用 CLI
@@ -30,6 +32,7 @@ python main.py --help
 code/base/
 ├── app.py                     # Streamlit GUI（已完整提供）
 ├── main.py                    # CLI 入口（已完整提供）
+├── run_gui.bat                # 一键启动 GUI（已完整提供）
 ├── answer-sheet.html          # 答题卡模板，可打印后填涂
 ├── requirements.txt           # Python 依赖
 ├── setup.bat                  # Windows 环境安装脚本
