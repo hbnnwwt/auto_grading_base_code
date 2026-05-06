@@ -223,7 +223,7 @@ def render_batch(threshold, llm_enabled, llm_api_key, llm_base_url,
                         "选择题": "-", "判断题": "-",
                         "简答题": r.get("essay", ""),
                     })
-        st.dataframe(summary, use_container_width=True, hide_index=True)
+        st.dataframe(summary, width='stretch', hide_index=True)
 
         st.divider()
 
@@ -255,14 +255,14 @@ def render_batch(threshold, llm_enabled, llm_api_key, llm_base_url,
                     rows = render_question_table(
                         _ch['question_start'], _ch['question_start'] + _ch['question_count'] - 1,
                         r["choice"], res["choice"] if res else None)
-                    st.dataframe(rows, use_container_width=True, hide_index=True)
+                    st.dataframe(rows, width='stretch', hide_index=True)
 
                 with dt2:
                     _ju = LAYOUT['judge']
                     rows = render_question_table(
                         _ju['question_start'], _ju['question_start'] + _ju['question_count'] - 1,
                         r["judge"], res["judge"] if res else None)
-                    st.dataframe(rows, use_container_width=True, hide_index=True)
+                    st.dataframe(rows, width='stretch', hide_index=True)
 
                 with dt3:
                     st.text_area("OCR 文本", r.get("essay", "(空)"),
@@ -322,5 +322,5 @@ def render_batch(threshold, llm_enabled, llm_api_key, llm_base_url,
                 "导出成绩 (xlsx)", buf,
                 file_name="grading_results.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                use_container_width=True,
+                width='stretch',
             )

@@ -44,7 +44,7 @@ def render_single(threshold, llm_enabled, llm_api_key, llm_base_url,
 
     if page1_file is not None and page2_file is not None:
         st.divider()
-        if st.button("开始识别", type="primary", use_container_width=True):
+        if st.button("开始识别", type="primary", width='stretch'):
             try:
                 page1_img = load_image_from_bytes(page1_file.read())
                 page2_img = load_image_from_bytes(page2_file.read())
@@ -76,11 +76,11 @@ def render_single(threshold, llm_enabled, llm_api_key, llm_base_url,
                 c1, c2 = st.columns(2)
                 with c1:
                     st.markdown(f"**第1页**  检测角度: `{p1_correction:+.1f}°`")
-                    st.image(p1_viz, use_container_width=True,
+                    st.image(p1_viz, width='stretch',
                              caption="绿色=轮廓  橙色=minAreaRect")
                 with c2:
                     st.markdown(f"**第2页**  检测角度: `{p2_correction:+.1f}°`")
-                    st.image(p2_viz, use_container_width=True,
+                    st.image(p2_viz, width='stretch',
                              caption="绿色=轮廓  橙色=minAreaRect")
 
                 # ── 1b: 矫正效果 ──
@@ -96,26 +96,26 @@ def render_single(threshold, llm_enabled, llm_api_key, llm_base_url,
                         bc, ac = st.columns(2)
                         with bc:
                             st.caption("矫正前")
-                            st.image(p1_before, use_container_width=True)
+                            st.image(p1_before, width='stretch')
                         with ac:
                             st.caption("矫正后")
-                            st.image(p1_orig, use_container_width=True)
+                            st.image(p1_orig, width='stretch')
                     else:
                         st.info("第1页 方向正确")
-                        st.image(p1_orig, use_container_width=True, caption="原图")
+                        st.image(p1_orig, width='stretch', caption="原图")
                 with c2:
                     if need_fix2:
                         st.success(f"第2页已矫正 `{p2_correction:+.1f}°`")
                         bc, ac = st.columns(2)
                         with bc:
                             st.caption("矫正前")
-                            st.image(p2_before, use_container_width=True)
+                            st.image(p2_before, width='stretch')
                         with ac:
                             st.caption("矫正后")
-                            st.image(p2_orig, use_container_width=True)
+                            st.image(p2_orig, width='stretch')
                     else:
                         st.info("第2页 方向正确")
-                        st.image(p2_orig, use_container_width=True, caption="原图")
+                        st.image(p2_orig, width='stretch', caption="原图")
 
             # ── Step 2: 图像增强 ──
             with st.expander("Step 2  图像增强", expanded=True):
@@ -128,25 +128,25 @@ def render_single(threshold, llm_enabled, llm_api_key, llm_base_url,
                     g1, e1, b1 = st.columns(3)
                     with g1:
                         st.caption("去噪灰度")
-                        st.image(p1_gray, use_container_width=True)
+                        st.image(p1_gray, width='stretch')
                     with e1:
                         st.caption("CLAHE 增强")
-                        st.image(p1_enhanced, use_container_width=True)
+                        st.image(p1_enhanced, width='stretch')
                     with b1:
                         st.caption("OTSU 二值化")
-                        st.image(p1_binary, use_container_width=True)
+                        st.image(p1_binary, width='stretch')
                 with c2:
                     st.markdown("**第2页**")
                     g2, e2, b2 = st.columns(3)
                     with g2:
                         st.caption("去噪灰度")
-                        st.image(p2_gray, use_container_width=True)
+                        st.image(p2_gray, width='stretch')
                     with e2:
                         st.caption("CLAHE 增强")
-                        st.image(p2_enhanced, use_container_width=True)
+                        st.image(p2_enhanced, width='stretch')
                     with b2:
                         st.caption("OTSU 二值化")
-                        st.image(p2_binary, use_container_width=True)
+                        st.image(p2_binary, width='stretch')
 
             # ── Step 3: 版面分析 ──
             output_dir = PATHS['output_dir']
@@ -205,17 +205,17 @@ def render_single(threshold, llm_enabled, llm_api_key, llm_base_url,
                 c1, c2 = st.columns(2)
                 with c1:
                     st.markdown("**第1页** 闭运算结果")
-                    st.image(p1_morph, use_container_width=True)
+                    st.image(p1_morph, width='stretch')
                 with c2:
                     st.markdown("**第2页** 闭运算结果")
-                    st.image(p2_morph, use_container_width=True)
+                    st.image(p2_morph, width='stretch')
 
                 # ── 2b: 区域定位 ──
                 st.markdown("##### 2b  区域定位")
                 c1, c2 = st.columns(2)
                 with c1:
                     st.markdown("**第1页区域定位**")
-                    st.image(p1_layout_viz, use_container_width=True)
+                    st.image(p1_layout_viz, width='stretch')
                     for k in ['student_id', 'choice']:
                         r = regions1.get(k)
                         if r:
@@ -224,7 +224,7 @@ def render_single(threshold, llm_enabled, llm_api_key, llm_base_url,
                             st.caption(f"{names_cn[k]}: 未检测到")
                 with c2:
                     st.markdown("**第2页区域定位**")
-                    st.image(p2_layout_viz, use_container_width=True)
+                    st.image(p2_layout_viz, width='stretch')
                     for k in ['judge', 'essay']:
                         r = regions2.get(k)
                         if r:
@@ -256,17 +256,17 @@ def render_single(threshold, llm_enabled, llm_api_key, llm_base_url,
                         with c1:
                             st.markdown("**① Canny 边缘**")
                             st.image(sid_rec.canny_image,
-                                     use_container_width=True,
+                                     width='stretch',
                                      caption="Canny(50, 150)")
                         with c2:
                             st.markdown("**② 面积 Top 3 轮廓**")
                             st.image(sid_rec.top10_contours_image,
-                                     use_container_width=True,
+                                     width='stretch',
                                      caption=f"检测到 {sid_rec.contour_count} 个轮廓")
                         with c3:
                             st.markdown("**③ 去#1取#3**")
                             st.image(sid_rec.third_selected_image,
-                                     use_container_width=True,
+                                     width='stretch',
                                      caption="红框=#1最大(去掉)  橙框=#3填涂网格")
                     if sid_rec.grid_bounds:
                         gx, gy, gw, gh = sid_rec.grid_bounds
@@ -281,7 +281,7 @@ def render_single(threshold, llm_enabled, llm_api_key, llm_base_url,
                     )
                     if sid_rec.grid_image is not None:
                         st.image(sid_rec.grid_image,
-                                 use_container_width=True,
+                                 width='stretch',
                                  caption="橙色=网格边框  灰线=单元格")
 
                     # ── 4a-3 网格扫描结果 ──
@@ -289,7 +289,7 @@ def render_single(threshold, llm_enabled, llm_api_key, llm_base_url,
                     with c1:
                         st.markdown(
                             f"**4a-3  网格扫描**  识别结果: `{student_id}`")
-                        st.image(sid_viz, use_container_width=True,
+                        st.image(sid_viz, width='stretch',
                                  caption="绿框=选中  橙框=半填充")
                     with c2:
                         sid_rows = []
@@ -302,7 +302,7 @@ def render_single(threshold, llm_enabled, llm_api_key, llm_base_url,
                                 '次高': (f"{d['runner_up_row']}号 "
                                          f"({d['runner_up_fill']:.0%})"),
                             })
-                        st.dataframe(sid_rows, use_container_width=True,
+                        st.dataframe(sid_rows, width='stretch',
                                      hide_index=True)
 
                     # ── 保存切分区域图像到 data/output ──
@@ -349,7 +349,7 @@ def render_single(threshold, llm_enabled, llm_api_key, llm_base_url,
                     st.caption(
                         f"将选择题区域均匀切分为 {_ch['rows']}行×{_ch['cols']}列"
                     )
-                    st.image(choice_all_result['grid_viz'], use_container_width=True,
+                    st.image(choice_all_result['grid_viz'], width='stretch',
                              caption="数字=题号  灰线=网格分割")
 
                     st.divider()
@@ -386,11 +386,11 @@ def render_single(threshold, llm_enabled, llm_api_key, llm_base_url,
                             })
                         c1, c2 = st.columns([3, 2])
                         with c1:
-                            st.image(full_viz, use_container_width=True,
+                            st.image(full_viz, width='stretch',
                                      caption="绿框=选中  橙框=半填充  灰线=选项分割")
                         with c2:
                             st.dataframe(choice_table,
-                                         use_container_width=True,
+                                         width='stretch',
                                          hide_index=True)
                         # ── 备查：选择题识别结果汇总 ──
                         st.markdown("**选择题识别结果（备查）**")
@@ -423,7 +423,7 @@ def render_single(threshold, llm_enabled, llm_api_key, llm_base_url,
                     st.caption(
                         f"将判断题区域均匀切分为 {_ju['rows']}行×{_ju['cols']}列"
                     )
-                    st.image(judge_all_result['grid_viz'], use_container_width=True,
+                    st.image(judge_all_result['grid_viz'], width='stretch',
                              caption="数字=题号  灰线=网格分割")
 
                     st.divider()
@@ -458,11 +458,11 @@ def render_single(threshold, llm_enabled, llm_api_key, llm_base_url,
                             })
                         c1, c2 = st.columns([3, 2])
                         with c1:
-                            st.image(full_viz, use_container_width=True,
+                            st.image(full_viz, width='stretch',
                                      caption="绿框=选中  橙框=半填充  灰线=选项分割")
                         with c2:
                             st.dataframe(judge_table,
-                                         use_container_width=True,
+                                         width='stretch',
                                          hide_index=True)
                         # ── 备查：判断题识别结果汇总 ──
                         st.markdown("**判断题识别结果（备查）**")
@@ -480,7 +480,7 @@ def render_single(threshold, llm_enabled, llm_api_key, llm_base_url,
                     c1, c2 = st.columns([1, 2])
                     with c1:
                         st.markdown("**简答题区域原图**")
-                        st.image(essay_roi, use_container_width=True)
+                        st.image(essay_roi, width='stretch')
                     with c2:
                         essay_text = recognize_essay(p2_orig, regions2,
                                                      ocr_engine,
@@ -531,12 +531,12 @@ def render_single(threshold, llm_enabled, llm_api_key, llm_base_url,
                 st.markdown("**选择题逐题对比**")
                 _ch = LAYOUT['choice']
                 rows = render_question_table(_ch['question_start'], _ch['question_start'] + _ch['question_count'] - 1, choice_answers, result["choice"])
-                st.dataframe(rows, use_container_width=True, hide_index=True)
+                st.dataframe(rows, width='stretch', hide_index=True)
 
                 st.markdown("**判断题逐题对比**")
                 _ju = LAYOUT['judge']
                 rows = render_question_table(_ju['question_start'], _ju['question_start'] + _ju['question_count'] - 1, judge_answers, result["judge"])
-                st.dataframe(rows, use_container_width=True, hide_index=True)
+                st.dataframe(rows, width='stretch', hide_index=True)
 
                 st.divider()
                 st.markdown("**简答题评分**")
@@ -572,11 +572,11 @@ def render_single(threshold, llm_enabled, llm_api_key, llm_base_url,
                 with c1:
                     st.caption("第1页（选择题）")
                     st.image(cv2.cvtColor(marked_p1, cv2.COLOR_BGR2RGB),
-                             use_container_width=True)
+                             width='stretch')
                 with c2:
                     st.caption("第2页（判断题）")
                     st.image(cv2.cvtColor(marked_p2, cv2.COLOR_BGR2RGB),
-                             use_container_width=True)
+                             width='stretch')
 
             # ── Step 7: 评分报告 ──
             with st.expander("Step 7  评分报告", expanded=True):
