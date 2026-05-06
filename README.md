@@ -33,6 +33,7 @@ code/base/
 ├── app.py                     # Streamlit GUI（已完整提供）
 ├── main.py                    # CLI 入口（已完整提供）
 ├── run_gui.bat                # 一键启动 GUI（已完整提供）
+├── run_tests.bat              # 一键运行测试（已完整提供）
 ├── answer-sheet.html          # 答题卡模板，可打印后填涂
 ├── requirements.txt           # Python 依赖
 ├── setup.bat                  # Windows 环境安装脚本
@@ -47,6 +48,7 @@ code/base/
 │   ├── pipeline.py             # 管线编排（连接各模块的胶水代码）
 │   ├── marker.py               # 错题可视化标注（红色 × 标记错题）
 │   ├── llm_essay_grader.py    # LLM 评分（加分项，已有完整实现）
+│   ├── config_validator.py     # 配置验证（无需修改）
 │   └── __init__.py            # 包导出
 │   # ===== 以下模块需要你实现 =====
 │   ├── preprocess.py           # 图像预处理
@@ -57,8 +59,22 @@ code/base/
 │   ├── judge_recognizer.py       # 判断题识别
 │   ├── essay_recognizer.py       # 简答题 OCR
 │   └── grading.py                # 评分逻辑
+├── views/                    # Streamlit 页面组件（已完整提供）
+│   ├── single_view.py
+│   ├── batch_view.py
+│   └── components.py
+├── tests/                    # 单元测试（已完整提供）
+│   ├── test_preprocess.py
+│   ├── test_layout.py
+│   ├── test_student_id_recognizer.py
+│   ├── test_choice_recognizer.py
+│   ├── test_judge_recognizer.py
+│   ├── test_essay_recognizer.py
+│   ├── test_grading.py
+│   └── ...
 └── data/
-    └── answer_sheets/            # 示例答题卡图片（4张，可用于测试）
+    ├── answer_sheets/            # 示例答题卡图片（4张+6张测试集）
+    └── GT/                       # Ground Truth 标准答案
 ```
 
 ---
@@ -231,6 +247,79 @@ except NotImplementedError as e:
 - 第1行：题号（1, 2, ..., 21, 22, ..., 31）
 - 第2行：标准答案
 - 选择题填 `A/B/C/D`，判断题填 `T/F`，简答题填参考文本
+
+---
+
+## 测试与自动化
+
+### 测试数据
+
+- **`data/answer_sheets/`** — 示例答题卡图片（4张，可用于测试）
+- **`data/GT/`** — Ground Truth 标准答案（各题型的标准答案文件）
+- **`data/参考答案.xlsx`** — 参考答案 Excel 格式
+
+### 运行测试
+
+**Windows 双击运行：**
+```bash
+run_tests.bat
+```
+
+**或手动运行 pytest：**
+```bash
+pytest tests/ -v
+```
+
+**单独运行某个测试：**
+```bash
+pytest tests/test_student_id_recognizer.py -v
+pytest tests/test_grading.py -v
+```
+
+### 测试覆盖
+
+| 测试文件 | 测试内容 |
+|---------|---------|
+| `test_preprocess.py` | 图像预处理（灰度化、二值化、旋转校正） |
+| `test_layout.py` | 版面分析（区域定位） |
+| `test_student_id_recognizer.py` | 学号识别 |
+| `test_choice_recognizer.py` | 选择题识别 |
+| `test_judge_recognizer.py` | 判断题识别 |
+| `test_essay_recognizer.py` | 简答题 OCR |
+| `test_grading.py` | 评分逻辑 |
+| `test_pipeline.py` | 整体管线流程 |
+| `test_marker.py` | 错题标注功能 |
+| `test_llm_essay_grader.py` | LLM 评分模块 |
+
+### 预期结果
+
+- 模块未实现时，对应测试会显示 `NotImplementedError` 或 `FAILED`
+- 逐个实现模块后，测试会从 FAIL → PASS
+- 全部实现后，所有测试应通过
+
+### 验证实现正确性
+
+```bash
+# 用示例图片验证学号识别
+python -c "
+from modules.student_id_recognizer import StudentIdRecognizer
+import cv2
+img = cv2.imread('data/answer_sheets/answer_sheet_1.png')
+roi = img[:, :300, :]
+rec = StudentIdRecognizer()
+print(rec.recognize(roi))
+"
+
+# 用示例图片验证选择题识别
+python -c "
+from modules.choice_recognizer import ChoiceRecognizer
+import cv2
+img = cv2.imread('data/answer_sheets/answer_sheet_1.png')
+roi = img[100:500, 200:800, :]
+rec = ChoiceRecognizer()
+print(rec.recognize_all_with_viz(roi, question_count=20, fixed_grid=(5, 4)))
+"
+```
 
 ---
 
