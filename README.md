@@ -12,7 +12,7 @@
 
 ```bash
 # 1. 克隆本仓库
-git clone https://github.com/hbnnwwt/cv_wei.git
+git clone https://github.com/hbnnwwt/auto_grading_base_code.git
 
 # 2. Windows：一键安装依赖（创建虚拟环境 + 安装全部依赖）
 setup.bat
