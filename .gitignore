@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Test / cache
+.pytest_cache/
+
+# Debug images
+_*.png
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Output (保留目录结构，不跟踪生成结果)
+data/output/*.xlsx
+data/output/_batch_checkpoint.json
+data/processed/
+
+# API Key（敏感信息，不入库）
+config/api_keys.json
+
+# Portable Python (太大，不应入库)
+python_portable/

@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>答题卡 - A4打印模板</title>
+<style>
+    /* ===== Design Tokens ===== */
+    :root {
+        --color-ink: #000;
+        --color-grid: #333;
+        --color-bg: #fff;
+        --color-bg-screen: #f5f5f5;
+        --color-bg-section: #fafafa;
+        --color-bg-label: #eee;
+        --color-hint: #666;
+        --color-instruction: #555;
+        --color-accent: #2c3e50;
+        --color-focus: #3498db;
+        --color-btn-primary: #3498db;
+        --color-btn-primary-hover: #2980b9;
+        --color-btn-secondary: #95a5a6;
+        --color-btn-secondary-hover: #7f8c8d;
+        --color-hint-bg: #fff8e1;
+        --color-hint-border: #ffd54f;
+        --color-write-bg: #fff;
+        --shadow-card: rgba(0,0,0,0.1);
+
+        --font-body: 'Arial', 'Helvetica', sans-serif;
+        --font-size-body: 12pt;
+        --font-size-title: 20pt;
+        --font-size-section: 14pt;
+        --font-size-info: 11pt;
+        --font-size-instruction: 10pt;
+        --font-size-option: 8pt;
+        --font-size-omr: 9pt;
+
+        --space-xs: 2mm;
+        --space-sm: 4mm;
+        --space-md: 5mm;
+        --space-lg: 8mm;
+        --space-xl: 10mm;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @page { size: A4; margin: 10mm; }
+
+    body {
+        font-family: var(--font-body);
+        font-size: var(--font-size-body);
+        line-height: 1.5;
+        color: var(--color-ink);
+        background-color: var(--color-bg);
+        padding: 5mm;
+        max-width: 210mm;
+        margin: 0 auto;
+    }
+
+    @media screen {
+        body {
+            background-color: var(--color-bg-screen);
+            box-shadow: 0 0 10px var(--shadow-card);
+            margin: 20px auto;
+            padding: 15mm;
+        }
+        .print-hint {
+            display: block;
+            background: var(--color-hint-bg);
+            border: 1px solid var(--color-hint-border);
+            padding: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: var(--font-size-info);
+        }
+    }
+
+    @media print {
+        .print-hint, .controls, .btn, .page-side { display: none !important; }
+        .page-mark {
+            display: block !important;
+            position: fixed;
+            bottom: 5mm;
+            right: 10mm;
+            font-size: 9pt;
+            color: #999;
+        }
+        body { padding: 0; background-color: var(--color-bg); }
+        .radio-omr input[type="radio"]:checked + .omr-box {
+            background-color: var(--color-ink) !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+
+    .page-side {
+        position: absolute;
+        top: 2mm;
+        right: 2mm;
+        font-size: var(--font-size-mark);
+        color: var(--color-hint);
+        font-weight: bold;
+    }
+
+    .page-title {
+        text-align: center;
+        font-size: var(--font-size-title);
+        font-weight: bold;
+        margin-bottom: var(--space-lg);
+        padding-bottom: var(--space-sm);
+        border-bottom: 2px solid var(--color-ink);
+    }
+
+    .exam-info {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: var(--space-lg);
+        font-size: var(--font-size-info);
+    }
+
+    /* 学号填涂区 */
+    .student-id-section {
+        margin-bottom: var(--space-xl);
+        border: 1px solid var(--color-grid);
+        padding: var(--space-sm);
+    }
+
+    .section-title {
+        font-size: var(--font-size-section);
+        font-weight: bold;
+        margin-bottom: var(--space-sm);
+        display: flex;
+        align-items: center;
+    }
+
+    .id-instruction {
+        font-size: var(--font-size-instruction);
+        margin-bottom: var(--space-sm);
+        color: var(--color-instruction);
+    }
+
+    /* 学号区域：grid布局，10列 */
+    #idGrid {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        /* 第1行(手写) 8mm + 数字行0-9 各7mm */
+        grid-template-rows: 8mm repeat(10, 7mm);
+        /* 渲染优化：内容可见性控制 */
+        content-visibility: auto;
+        contain: layout style;
+    }
+
+    .id-cell {
+        text-align: center;
+        padding: 1px;
+        font-size: var(--font-size-instruction);
+        min-height: 7mm;
+        outline: 1px solid var(--color-grid);
+        outline-offset: -1px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* 手写学号行 */
+    .id-write-cell {
+        background-color: var(--color-write-bg);
+    }
+
+    /* OMR风格单选框 */
+    .radio-omr {
+        position: relative;
+        /* 触摸目标：印刷6mm，屏幕44px */
+        width: 6mm;
+        height: 6mm;
+    }
+
+    /* 屏幕媒体下强制最小44px触摸目标 */
+    @media screen {
+        .radio-omr {
+            width: 44px;
+            height: 44px;
+        }
+    }
+
+    .radio-omr input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        z-index: 2;
+        /* 确保足够大以覆盖整个触摸区域 */
+        top: 0; left: 0;
+    }
+
+    .radio-omr input[type="radio"]:focus + .omr-box {
+        outline: 2px solid var(--color-focus);
+        outline-offset: 2px;
+    }
+
+    .omr-box {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        border: 1px solid var(--color-grid);
+        background-color: var(--color-bg);
+        transition: background-color 0.15s ease, border-color 0.15s ease;
+        z-index: 1;
+    }
+
+    /* 减少动画：尊重用户系统偏好 */
+    @media (prefers-reduced-motion: reduce) {
+        .omr-box {
+            transition: none !important;
+        }
+    }
+
+    .radio-omr input[type="radio"]:checked + .omr-box {
+        background-color: var(--color-ink);
+        border-color: var(--color-ink);
+        color: var(--color-bg);
+    }
+
+    .radio-omr input[type="radio"]:checked + .omr-box::after {
+        display: none;
+    }
+
+    /* 选择题区域 */
+    .mcq-section {
+        margin-bottom: var(--space-xl);
+        border: 1px solid var(--color-grid);
+        padding: var(--space-sm);
+        contain: layout style;
+    }
+
+    .mcq-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 3mm 5mm;
+        margin-top: var(--space-md);
+        content-visibility: auto;
+        contain: layout style;
+    }
+
+    .mcq-item { display: flex; align-items: center; }
+
+    .question-number {
+        font-weight: bold;
+        min-width: 20px;
+        margin-right: 3mm;
+    }
+
+    .mcq-options {
+        display: flex;
+        flex: 1;
+        justify-content: space-between;
+    }
+
+    .mcq-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 1mm;
+    }
+
+    .option-label {
+        font-size: var(--font-size-option);
+        height: 3mm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-grid);
+    }
+
+    .mcq-option .radio-omr .omr-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: var(--font-size-mark);
+    }
+
+    /* 判断题区域 */
+    .tf-section {
+        margin-bottom: var(--space-xl);
+        border: 1px solid var(--color-grid);
+        padding: var(--space-sm);
+        contain: layout style;
+    }
+
+    .tf-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 3mm 5mm;
+        margin-top: var(--space-md);
+        content-visibility: auto;
+        contain: layout style;
+    }
+
+    .tf-item { display: flex; align-items: center; }
+
+    .tf-options {
+        display: flex;
+        flex: 1;
+        justify-content: space-around;
+    }
+
+    /* 简答题区域 */
+    .essay-section {
+        margin-bottom: var(--space-md);
+        border: 1px solid var(--color-grid);
+        padding: var(--space-sm);
+        contain: layout style;
+    }
+
+    .essay-instruction {
+        font-size: var(--font-size-instruction);
+        margin-bottom: var(--space-sm);
+        color: var(--color-instruction);
+    }
+
+    .essay-line {
+        width: 100%;
+        height: 8mm;
+        margin-bottom: var(--space-xs);
+        border-bottom: 1px solid var(--color-grid);
+        position: relative;
+    }
+
+    /* 控制按钮 */
+    .controls {
+        display: flex;
+        justify-content: center;
+        gap: var(--space-xl);
+        margin-top: var(--space-xl);
+        padding-top: var(--space-md);
+        border-top: 1px dashed var(--color-hint);
+    }
+
+    .btn {
+        padding: 8px 20px;
+        border: none;
+        font-size: var(--font-size-info);
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .btn-primary { background-color: var(--color-btn-primary); color: var(--color-bg); }
+    .btn-primary:hover { background-color: var(--color-btn-primary-hover); }
+    .btn-secondary { background-color: var(--color-btn-secondary); color: var(--color-bg); }
+    .btn-secondary:hover { background-color: var(--color-btn-secondary-hover); }
+
+    .page-mark {
+        position: absolute;
+        bottom: 2mm;
+        right: 2mm;
+        font-size: var(--font-size-mark);
+        color: var(--color-hint);
+    }
+
+    /* 背面默认隐藏 */
+    #backContent { display: none; }
+
+    /* 响应式 */
+    @media (max-width: 210mm) {
+        .mcq-grid, .tf-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (max-width: 160mm) {
+        .mcq-grid, .tf-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+</style>
+</head>
+<body>
+
+<!-- 正面 -->
+<div id="frontContent">
+    <div class="print-hint">
+        请使用 <strong>Ctrl+P</strong> 打开打印对话框，选择A4纸张，边距设置为"默认"或"无"。
+    </div>
+    <div class="page-side">正面</div>
+    <h1 class="page-title">标准化考试答题卡</h1>
+    <div class="exam-info">
+        <div><strong>科目：</strong> _______________</div>
+        <div><strong>考试日期：</strong> _______________</div>
+        <div><strong>姓名：</strong> _______________</div>
+    </div>
+
+    <section class="student-id-section" role="group" aria-label="学号填涂区">
+        <h2 class="section-title">学号填涂区</h2>
+        <p class="id-instruction">第一行手写填写学号（从左至右第1位至第10位），下方的数字格用于机器阅卷填涂。</p>
+        <div class="id-grid" id="idGrid" role="group" aria-label="学号 — 10位数字，每列选择一个数字填涂"></div>
+    </section>
+
+    <section class="mcq-section" role="group" aria-label="选择题">
+        <h2 class="section-title">选择题 (1-20题)</h2>
+        <p class="id-instruction">每题有A、B、C、D四个选项，请选择正确答案并填涂。</p>
+        <div class="mcq-grid" id="mcqGrid" role="group" aria-label="选择题答题区"></div>
+    </section>
+
+    <div class="controls">
+        <button class="btn btn-secondary" id="clearBtn">清空所有选项</button>
+        <button class="btn btn-primary" id="printBtn">打印答题卡</button>
+        <button class="btn btn-secondary" id="viewBackBtn">查看背面</button>
+    </div>
+    <div class="page-mark">第 1 页 / 共 2 页</div>
+</div>
+
+<!-- 背面 -->
+<div id="backContent">
+    <div class="print-hint">
+        请使用 <strong>Ctrl+P</strong> 打开打印对话框，选择A4纸张，边距设置为"默认"或"无"。
+    </div>
+    <div class="page-side">背面</div>
+    <h1 class="page-title">标准化考试答题卡（二）</h1>
+    <div class="exam-info">
+        <div><strong>科目：</strong> _______________</div>
+        <div><strong>考试日期：</strong> _______________</div>
+        <div><strong>姓名：</strong> _______________</div>
+    </div>
+
+    <section class="tf-section" role="group" aria-label="判断题">
+        <h2 class="section-title">判断题 (21-30题)</h2>
+        <p class="id-instruction">判断题目正误，正确填涂T，错误填涂F。</p>
+        <div class="tf-grid" id="tfGrid" role="group" aria-label="判断题答题区"></div>
+    </section>
+
+    <section class="essay-section">
+        <h2 class="section-title">简答题 (31题)</h2>
+        <p class="essay-instruction">请在横线上书写答案，每题预留10行作答空间。</p>
+        <div id="essayLines"></div>
+    </section>
+
+    <div class="controls">
+        <button class="btn btn-secondary" id="clearBackBtn">清空所有选项</button>
+        <button class="btn btn-primary" id="printBackBtn">打印答题卡</button>
+        <button class="btn btn-secondary" id="viewFrontBtn">查看正面</button>
+    </div>
+    <div class="page-mark">第 2 页 / 共 2 页</div>
+</div>
+
+<script>
+    // ===== 生成学号grid (CSS Grid：10列×11行扁平结构) =====
+    (function generateIdGrid() {
+        var grid = document.getElementById('idGrid');
+        // 第1行(8mm)：手写学号（10个格）
+        for (var col = 1; col <= 10; col++) {
+            var cell = document.createElement('div');
+            cell.className = 'id-cell id-write-cell';
+            cell.setAttribute('aria-label', '学号第' + col + '位，手写格');
+            grid.appendChild(cell);
+        }
+        // 数字行 0-9：每个单元格内放一个OMR框，框内显示数字
+        for (var d = 0; d <= 9; d++) {
+            for (var c = 1; c <= 10; c++) {
+                var radioCell = document.createElement('div');
+                radioCell.className = 'id-cell';
+                radioCell.innerHTML = '<label class="radio-omr"><input name="digit_' + c + '" type="radio" value="' + d + '" aria-label="学号第' + c + '位，数字' + d + '"/><span class="omr-box" aria-hidden="true">' + d + '</span></label>';
+                grid.appendChild(radioCell);
+            }
+        }
+    })();
+
+    // ===== 生成选择题 1-20 =====
+    (function generateMcq() {
+        const grid = document.getElementById('mcqGrid');
+        for (let i = 1; i <= 20; i++) {
+            const item = document.createElement('div');
+            item.className = 'mcq-item';
+            item.setAttribute('role', 'group');
+            item.setAttribute('aria-label', '第' + i + '题，共20题');
+            item.innerHTML = `<div class="question-number" aria-hidden="true">${i}.</div><div class="mcq-options">` +
+                ['A','B','C','D'].map(o =>
+                    `<div class="mcq-option"><label class="radio-omr"><input name="q${i}" type="radio" value="${o}" aria-label="第${i}题，选项${o}"/><span class="omr-box" aria-hidden="true">${o}</span></label></div>`
+                ).join('') + '</div>';
+            grid.appendChild(item);
+        }
+    })();
+
+    // ===== 生成判断题 21-30 =====
+    (function generateTf() {
+        const grid = document.getElementById('tfGrid');
+        for (let i = 21; i <= 30; i++) {
+            const item = document.createElement('div');
+            item.className = 'tf-item';
+            item.setAttribute('role', 'group');
+            item.setAttribute('aria-label', '第' + i + '题，共10题');
+            item.innerHTML = `<div class="question-number" aria-hidden="true">${i}.</div><div class="tf-options">` +
+                [{v:'T',l:'正确'},{v:'F',l:'错误'}].map(o =>
+                    `<div class="mcq-option"><label class="radio-omr"><input name="q${i}" type="radio" value="${o.v}" aria-label="第${i}题，${o.l}"/><span class="omr-box" aria-hidden="true">${o.v}</span></label></div>`
+                ).join('') + '</div>';
+            grid.appendChild(item);
+        }
+    })();
+
+    // ===== 生成简答题横线 31 =====
+    (function generateEssay() {
+        const container = document.getElementById('essayLines');
+        for (let q = 31; q <= 31; q++) {
+            const title = document.createElement('div');
+            title.style.fontWeight = 'bold';
+            title.style.marginTop = '6mm';
+            title.style.marginBottom = '2mm';
+            title.textContent = q + '.';
+            container.appendChild(title);
+            for (let line = 1; line <= 10; line++) {
+                const el = document.createElement('div');
+                el.className = 'essay-line';
+                el.setAttribute('data-number', `${q}-${line}`);
+                container.appendChild(el);
+            }
+        }
+    })();
+
+    // ===== 切换正/背面 =====
+    document.getElementById('viewBackBtn').addEventListener('click', function() {
+        document.getElementById('frontContent').style.display = 'none';
+        document.getElementById('backContent').style.display = 'block';
+    });
+
+    document.getElementById('viewFrontBtn').addEventListener('click', function() {
+        document.getElementById('backContent').style.display = 'none';
+        document.getElementById('frontContent').style.display = 'block';
+    });
+
+    // ===== 清空选项 =====
+    function clearAllRadios() {
+        document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+    }
+
+    document.getElementById('clearBtn').addEventListener('click', function() {
+        clearAllRadios();
+        alert('正面选项已清空！');
+    });
+
+    document.getElementById('clearBackBtn').addEventListener('click', function() {
+        clearAllRadios();
+        alert('背面选项已清空！');
+    });
+
+    // ===== 打印 =====
+    document.getElementById('printBtn').addEventListener('click', function() {
+        // 临时显示正面用于打印
+        document.getElementById('backContent').style.display = 'none';
+        document.getElementById('frontContent').style.display = 'block';
+        window.print();
+    });
+
+    document.getElementById('printBackBtn').addEventListener('click', function() {
+        document.getElementById('frontContent').style.display = 'none';
+        document.getElementById('backContent').style.display = 'block';
+        window.print();
+    });
+
+    // ===== 键盘支持：空格选中 =====
+    document.addEventListener('keydown', function(e) {
+        if (e.key === ' ' || e.key === 'Spacebar') {
+            const el = document.activeElement;
+            if (el && el.type === 'radio') {
+                el.checked = true;
+                e.preventDefault();
+            }
+        }
+    });
+</script>
+</body>
+</html>
